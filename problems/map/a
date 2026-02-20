@@ -1,0 +1,4 @@
+{
+    "input": "SET a ab\nGET a\nSIZE\n",
+    "output": "ab\n(empty)\n"
+}

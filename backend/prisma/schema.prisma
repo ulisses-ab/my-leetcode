@@ -1,0 +1,87 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String    @id @default(cuid())
+  handle       String    @unique
+  email        String  
+  role         String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  submissions  Submission[]
+  problems     Problem[] @relation("CreatedProblems")
+
+  oAuthIdentities OAuthIdentity[] 
+}
+
+model OAuthIdentity {
+  id              String        @id @default(cuid())
+  userId          String
+
+  provider        String
+  providerUserId  String
+
+  createdAt       DateTime      @default(now())
+
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerUserId])
+  @@index([userId])
+}
+
+model Problem {
+  id        String         @id @default(cuid())
+  title     String
+  description String      @default("")
+  statement String
+  difficulty String
+  creator   User           @relation("CreatedProblems", fields: [creatorId], references: [id])
+  creatorId String
+  setups    ProblemSetup[]  
+  defaultTestsFileKey   String?
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  submissions Submission[]
+}
+
+model ProblemSetup {
+  id           String   @id @default(cuid())
+  problem      Problem  @relation(fields: [problemId], references: [id])
+  problemId    String
+  language     String
+  info         String
+  runnerFileKey String?
+  testsFileKey  String? 
+  templateFileKey String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  submissions  Submission[]
+}
+
+model Submission {
+  id            String   @id @default(cuid())
+  user          User     @relation(fields: [userId], references: [id])
+  userId        String
+  problem       Problem  @relation(fields: [problemId], references: [id])
+  problemId     String
+  setup         ProblemSetup @relation(fields: [setupId], references: [id])
+  setupId       String
+  codeFileKey   String
+  resultsFileKey String?
+  status        String
+  temporary     Boolean
+  submittedAt   DateTime
+  finishedAt    DateTime?
+}

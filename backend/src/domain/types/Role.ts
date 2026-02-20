@@ -1,0 +1,5 @@
+export enum Role {
+  ADMIN = "ADMIN",
+  REGULAR = "REGULAR",
+  EXECUTION_ENGINE = "EXECUTION_ENGINE"
+}

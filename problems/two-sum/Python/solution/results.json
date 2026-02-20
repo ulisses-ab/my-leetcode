@@ -1,0 +1,287 @@
+{
+  "success": true,
+  "total_tests": 12,
+  "passed_tests": 12,
+  "failed_tests": 0,
+  "results": [
+    {
+      "testcase": 1,
+      "input": {
+        "nums": [
+          2,
+          7,
+          11,
+          15
+        ],
+        "target": 9
+      },
+      "expected_output": [
+        0,
+        1
+      ],
+      "passed": true,
+      "error": null,
+      "actual_output": [
+        0,
+        1
+      ]
+    },
+    {
+      "testcase": 2,
+      "input": {
+        "nums": [
+          3,
+          2,
+          4
+        ],
+        "target": 6
+      },
+      "expected_output": [
+        1,
+        2
+      ],
+      "passed": true,
+      "error": null,
+      "actual_output": [
+        1,
+        2
+      ]
+    },
+    {
+      "testcase": 3,
+      "input": {
+        "nums": [
+          3,
+          3
+        ],
+        "target": 6
+      },
+      "expected_output": [
+        0,
+        1
+      ],
+      "passed": true,
+      "error": null,
+      "actual_output": [
+        0,
+        1
+      ]
+    },
+    {
+      "testcase": 4,
+      "input": {
+        "nums": [
+          -1,
+          -2,
+          -3,
+          -4,
+          -5
+        ],
+        "target": -8
+      },
+      "expected_output": [
+        2,
+        4
+      ],
+      "passed": true,
+      "error": null,
+      "actual_output": [
+        2,
+        4
+      ]
+    },
+    {
+      "testcase": 5,
+      "input": {
+        "nums": [
+          1,
+          5,
+          3,
+          7,
+          9,
+          2
+        ],
+        "target": 10
+      },
+      "expected_output": [
+        2,
+        3
+      ],
+      "passed": true,
+      "error": null,
+      "actual_output": [
+        2,
+        3
+      ]
+    },
+    {
+      "testcase": 6,
+      "input": {
+        "nums": [
+          0,
+          4,
+          3,
+          0
+        ],
+        "target": 0
+      },
+      "expected_output": [
+        0,
+        3
+      ],
+      "passed": true,
+      "error": null,
+      "actual_output": [
+        0,
+        3
+      ]
+    },
+    {
+      "testcase": 7,
+      "input": {
+        "nums": [
+          -3,
+          4,
+          3,
+          90
+        ],
+        "target": 0
+      },
+      "expected_output": [
+        0,
+        2
+      ],
+      "passed": true,
+      "error": null,
+      "actual_output": [
+        0,
+        2
+      ]
+    },
+    {
+      "testcase": 8,
+      "input": {
+        "nums": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "target": 19
+      },
+      "expected_output": [
+        8,
+        9
+      ],
+      "passed": true,
+      "error": null,
+      "actual_output": [
+        8,
+        9
+      ]
+    },
+    {
+      "testcase": 9,
+      "input": {
+        "nums": [
+          15,
+          7
+        ],
+        "target": 22
+      },
+      "expected_output": [
+        0,
+        1
+      ],
+      "passed": true,
+      "error": null,
+      "actual_output": [
+        0,
+        1
+      ]
+    },
+    {
+      "testcase": 10,
+      "input": {
+        "nums": [
+          2,
+          5,
+          5,
+          11
+        ],
+        "target": 10
+      },
+      "expected_output": [
+        1,
+        2
+      ],
+      "passed": true,
+      "error": null,
+      "actual_output": [
+        1,
+        2
+      ]
+    },
+    {
+      "testcase": 11,
+      "input": {
+        "nums": [
+          -10,
+          7,
+          19,
+          15
+        ],
+        "target": 9
+      },
+      "expected_output": [
+        0,
+        2
+      ],
+      "passed": true,
+      "error": null,
+      "actual_output": [
+        0,
+        2
+      ]
+    },
+    {
+      "testcase": 12,
+      "input": {
+        "nums": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          7,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          11
+        ],
+        "target": 18
+      },
+      "expected_output": [
+        7,
+        14
+      ],
+      "passed": true,
+      "error": null,
+      "actual_output": [
+        7,
+        14
+      ]
+    }
+  ]
+}
