@@ -22,6 +22,12 @@ export type SubmissionDetailsProps = {
   onClose: () => void;
 };
 
+function getTimeFromResults(results: any) {
+  let total = 0;
+  results.testcases.forEach((testcase: any) => {total += testcase.time_ms});
+  return Math.trunc(total);
+}
+
 export function SubmissionDetails({ id, onClose }: SubmissionDetailsProps) {
   const { data, isLoading } = useSubmissionWithResults(id);
   const setSubmissionResults = useWorkspaceStore(state => state.setSubmissionResults);
@@ -89,10 +95,12 @@ export function SubmissionDetails({ id, onClose }: SubmissionDetailsProps) {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <StatCard icon={<Clock size={16}/>} label="Runtime" value={results?.time_ms ? `${results.time_ms}ms` : "N/A"} />
-        <StatCard icon={<Hash size={16}/>} label="Memory" value={results?.memory ? `${results.memory}KB` : "N/A"} />
-      </div>
+      {submission.status === "ACCEPTED" && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <StatCard icon={<Clock size={16}/>} label="Runtime" value={`${getTimeFromResults(results)}ms`} />
+          <StatCard icon={<Hash size={16}/>} label="Memory" value={results?.memory ? `${results.memory}KB` : "N/A"} />
+        </div>
+      )}
 
       {/* Error or Details View */}
       {submission.status === "FAILED" && (

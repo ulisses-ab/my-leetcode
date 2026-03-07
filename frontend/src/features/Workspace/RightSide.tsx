@@ -15,10 +15,10 @@ export function RightSide() {
   const setRightTab = useWorkspaceStore(state => state.setRightTab);
 
   return (
-    <div className="bg-card h-full">
+    <div className="h-full flex flex-col">
       <Tabs 
         value={rightTab} 
-        className="h-full" 
+        className="flex flex-col h-full" 
         onValueChange={(val) => setRightTab(val)}
       >
         <div className="bg-muted">
@@ -27,7 +27,8 @@ export function RightSide() {
             <TabsTrigger value="tests">Tests</TabsTrigger>
           </TabsList>
         </div>
-        <div className="overflow-auto h-full">
+
+        <div className="flex-1 overflow-y-auto">
           <TabsContent className="mt-0 h-full" value="editor" forceMount>
             <EditorContainer />
           </TabsContent>
