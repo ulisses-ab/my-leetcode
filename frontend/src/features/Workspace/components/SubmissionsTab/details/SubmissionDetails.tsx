@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { playClose } from "@/lib/sounds";
+import { useSoundStore } from "@/stores/useSoundStore";
 import {
   Dialog,
   DialogContent,
@@ -22,10 +24,10 @@ export type SubmissionDetailsProps = {
 };
 
 const STATUS = {
-  ACCEPTED: { label: "Accepted", color: "text-emerald-400", bar: "bg-emerald-500" },
-  REJECTED: { label: "Wrong Answer", color: "text-rose-400", bar: "bg-rose-500"   },
-  FAILED:   { label: "Runtime Error", color: "text-rose-400", bar: "bg-rose-500"  },
-  PENDING:  { label: "Pending",       color: "text-blue-400", bar: "bg-blue-500"  },
+  ACCEPTED: { label: "Accepted",      color: "text-bb-success", bar: "bg-bb-success" },
+  REJECTED: { label: "Wrong Answer",  color: "text-bb-error",   bar: "bg-bb-error"   },
+  FAILED:   { label: "Runtime Error", color: "text-bb-warning", bar: "bg-bb-warning" },
+  PENDING:  { label: "Pending",       color: "text-bb-info",    bar: "bg-bb-info"    },
 } as const;
 
 function totalMs(results: any): number {
@@ -39,7 +41,6 @@ export function SubmissionDetails({ id, onClose }: SubmissionDetailsProps) {
   const { mutateAsync: fetchCode, isPending: isLoadingCode } = useSubmissionCode();
   const setSubmissionResults = useWorkspaceStore(state => state.setSubmissionResults);
   const setRightTab = useWorkspaceStore(state => state.setRightTab);
-  const editor = useWorkspaceStore(state => state.editor);
   const problem  = useWorkspaceStore(state => state.problem);
   const setupId  = useWorkspaceStore(state => state.setup?.id);
   const { data: tests } = useTests(problem?.id!, setupId!);
@@ -61,9 +62,9 @@ export function SubmissionDetails({ id, onClose }: SubmissionDetailsProps) {
 
   if (isLoading || !data) {
     return (
-      <div className="flex flex-col items-center justify-center h-48 gap-2 text-muted-foreground/40">
+      <div className="flex flex-col items-center justify-center h-48 gap-2 text-bb-muted-strong">
         <Loader2 size={18} className="animate-spin" />
-        <span className="text-xs">Loading…</span>
+        <span className="font-mono text-[10px] uppercase tracking-[0.18em]">Loading…</span>
       </div>
     );
   }
@@ -81,19 +82,18 @@ export function SubmissionDetails({ id, onClose }: SubmissionDetailsProps) {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Load submission code?</DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="font-sans text-xs text-bb-muted-strong">
               This will replace your current code in the editor with the code from this submission. Any unsaved changes will be lost.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setConfirmOpen(false)}>
+            <Button variant="outline" onClick={() => setConfirmOpen(false)}>
               Cancel
             </Button>
             <Button
               onClick={handleConfirmLoad}
               disabled={isLoadingCode}
-              className="!bg-indigo-500/20 border-indigo-500/30 text-indigo-300 hover:!bg-indigo-500/30 hover:border-indigo-500/50 hover:text-indigo-200 transition-none"
-              variant="outline"
+              variant="default"
             >
               {isLoadingCode && <Loader2 size={13} className="animate-spin mr-1" />}
               Load code
@@ -103,45 +103,41 @@ export function SubmissionDetails({ id, onClose }: SubmissionDetailsProps) {
       </Dialog>
 
       <div className="flex flex-col h-full overflow-y-auto">
-        {/* Back */}
-        <div className="flex items-center px-3 py-2 border-b border-border/30 shrink-0">
+        <div className="flex items-center px-3 py-2 border-b-2 border-bb-border/40 shrink-0">
           <button
-            onClick={onClose}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-md text-sm font-medium text-foreground/70 hover:text-foreground hover:bg-white/[0.07] transition-colors"
+            onClick={() => { if (useSoundStore.getState().enabled) playClose(); onClose(); }}
+            className="flex items-center gap-1 px-2.5 py-1.5 border-2 border-bb-border/55 bg-bb-surface/72 font-sans text-xs uppercase tracking-wide text-bb-ink hover:text-bb-accent hover:border-bb-accent transition-colors"
           >
-            <ChevronLeft size={16} strokeWidth={2.5} />
+            <ChevronLeft size={14} strokeWidth={2.5} />
             All Submissions
           </button>
         </div>
 
         <div className="flex-1 px-5 py-5 space-y-5">
-          {/* Status hero */}
           <div>
-            <p className={cn("text-2xl font-bold tracking-tight", theme.color)}>
+            <p className={cn("bb-text-depth-sm font-display text-2xl uppercase tracking-tight", theme.color)}>
               {theme.label}
             </p>
-            <p className="text-xs text-muted-foreground/50 mt-1">
+            <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-bb-muted-strong mt-1">
               {format(new Date(submission.submittedAt), "MMM d, yyyy · h:mm a")}
             </p>
           </div>
 
-          {/* Testcase progress */}
           {totalTests > 0 && (
             <div className="space-y-2">
-              <div className="flex justify-between text-xs text-muted-foreground/60">
+              <div className="flex justify-between font-mono text-[10px] uppercase tracking-[0.14em] text-bb-muted-strong">
                 <span>Test cases</span>
-                <span className="tabular-nums font-mono">{passedTests} / {totalTests}</span>
+                <span className="tabular-nums">{passedTests} / {totalTests}</span>
               </div>
-              <div className="h-1.5 w-full rounded-full bg-white/[0.06] overflow-hidden">
+              <div className="h-1.5 w-full border border-bb-border/50 bg-bb-bg-deep p-px">
                 <div
-                  className={cn("h-full rounded-full transition-all duration-500", theme.bar)}
+                  className={cn("h-full transition-all duration-500", theme.bar)}
                   style={{ width: `${pct}%` }}
                 />
               </div>
             </div>
           )}
 
-          {/* Stats — only on accepted */}
           {submission.status === "ACCEPTED" && results && (
             <div className="grid grid-cols-2 gap-2">
               <StatCard
@@ -157,11 +153,10 @@ export function SubmissionDetails({ id, onClose }: SubmissionDetailsProps) {
             </div>
           )}
 
-          {/* Error output */}
           {submission.status === "FAILED" && (
-            <div className="rounded-lg border border-rose-500/15 bg-rose-500/5 p-4">
+            <div className="border-2 border-bb-warning/40 bg-bb-warning/[0.08] p-4">
               <div className="flex items-center justify-between mb-2">
-                <p className="text-[11px] text-rose-400/60 uppercase tracking-widest font-medium">
+                <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-bb-warning">
                   Error
                 </p>
                 <CopyToClipboardButton
@@ -169,26 +164,20 @@ export function SubmissionDetails({ id, onClose }: SubmissionDetailsProps) {
                   variant="ghost"
                   size="icon"
                   showText={false}
-                  className="h-6 w-6 text-rose-400/50 hover:text-rose-300 hover:bg-rose-500/10"
+                  className="h-6 w-6 text-bb-warning hover:text-bb-warning"
                 />
               </div>
-              <pre className="text-xs font-mono text-rose-300/80 whitespace-pre-wrap leading-relaxed overflow-x-auto max-h-60">
+              <pre className="font-mono text-xs text-bb-warning whitespace-pre-wrap leading-relaxed overflow-x-auto max-h-60">
                 {results?.error ?? "Unknown error"}
               </pre>
             </div>
           )}
 
-          {/* Submission ID */}
-          <p className="text-[10px] font-mono text-muted-foreground/25 break-all">
-            {/*submission.id*/}
-          </p>
-
-          {/* Load code button */}
           <Button
             variant="outline"
             onClick={() => setConfirmOpen(true)}
             disabled={isLoadingCode}
-            className="w-full !bg-indigo-500/10 border-indigo-500/20 text-indigo-300/80 hover:!bg-indigo-500/20 hover:border-indigo-500/40 hover:text-indigo-200 transition-none gap-2"
+            className="w-full gap-2"
           >
             {isLoadingCode
               ? <Loader2 size={14} className="animate-spin" />
@@ -196,7 +185,6 @@ export function SubmissionDetails({ id, onClose }: SubmissionDetailsProps) {
             }
             Load code in editor
           </Button>
-
         </div>
       </div>
     </>
@@ -205,12 +193,12 @@ export function SubmissionDetails({ id, onClose }: SubmissionDetailsProps) {
 
 function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
-    <div className="flex flex-col gap-1 rounded-lg border border-border/40 bg-white/[0.03] px-3 py-2.5">
-      <div className="flex items-center gap-1.5 text-muted-foreground/50">
+    <div className="flex flex-col gap-1 border-2 border-bb-border/45 bg-bb-bg/40 px-3 py-2.5">
+      <div className="flex items-center gap-1.5 text-bb-muted-strong">
         {icon}
-        <span className="text-[10px] uppercase tracking-widest font-medium">{label}</span>
+        <span className="font-mono text-[10px] uppercase tracking-[0.14em]">{label}</span>
       </div>
-      <span className="text-sm font-semibold font-mono">{value}</span>
+      <span className="font-mono text-sm text-bb-ink">{value}</span>
     </div>
   );
 }

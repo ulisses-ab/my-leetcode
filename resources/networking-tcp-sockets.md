@@ -36,12 +36,151 @@ The standard approaches are:
 
 **Thread pool** combines both: a fixed number of threads each pick up connections from a queue. This bounds memory use while still allowing concurrency.
 
-## RESP — Redis Serialization Protocol
+## Language-specific guidance
 
-Redis communicates over plain TCP using a text protocol called RESP. Each value is prefixed with a byte indicating its type, followed by the data and a CRLF terminator. The types are: simple strings (`+`), errors (`-`), integers (`:`), bulk strings (`$` followed by the byte length), and arrays (`*` followed by the element count).
+### C
 
-The protocol is line-oriented and trivial to parse without a parser library — you read until CRLF, check the first byte, and handle the rest accordingly. This simplicity is a deliberate design choice that makes it easy to interact with Redis using nothing but a raw TCP connection and `cat`.
+Use the POSIX socket API. Set `SO_REUSEADDR` so the port is immediately available after a restart, then `bind`, `listen`, and loop on `accept`. Ignore `SIGPIPE` so the process doesn't crash when the client disconnects mid-write.
 
-## Why this matters for Mini Redis
+```c
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <unistd.h>
+#include <signal.h>
 
-Implementing a Redis-like server means accepting TCP connections, parsing RESP-encoded commands, dispatching to command handlers (GET, SET, DEL, EXPIRE, etc.), and writing RESP-encoded responses back. Each piece — socket binding, accept loop, RESP parsing, command dispatch — is a separable concern that you can design and test independently.
+int server_fd = socket(AF_INET, SOCK_STREAM, 0);
+int opt = 1;
+setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+
+struct sockaddr_in addr = {0};
+addr.sin_family      = AF_INET;
+addr.sin_addr.s_addr = INADDR_ANY;
+addr.sin_port        = htons(port);
+
+bind(server_fd, (struct sockaddr *)&addr, sizeof(addr));
+listen(server_fd, 8);
+signal(SIGPIPE, SIG_IGN);
+
+for (;;) {
+    int client_fd = accept(server_fd, NULL, NULL);
+    if (client_fd < 0) continue;
+    handle_client(client_fd);
+    close(client_fd);
+}
+```
+
+**Reading bytes**: `read(fd, buf, n)` blocks until at least one byte arrives and returns the number of bytes actually read, or 0 on EOF, or -1 on error. Never assume one `read` fills the buffer — loop until you have all the bytes you need.
+
+```c
+int read_exact(int fd, char *buf, size_t n) {
+    size_t total = 0;
+    while (total < n) {
+        ssize_t r = read(fd, buf + total, n - total);
+        if (r <= 0) return 0;
+        total += r;
+    }
+    return 1;
+}
+```
+
+**Writing bytes**: `write(fd, buf, n)` may also write fewer bytes than requested (rare on TCP but possible). The same loop pattern applies.
+
+---
+
+### C++
+
+The POSIX API is identical to C. A convenient shortcut is to wrap the accepted fd in `FILE*` via `fdopen` so you can use buffered `fgets`/`fprintf` instead of raw `read`/`write`.
+
+```cpp
+int client_fd = accept(server_fd, nullptr, nullptr);
+FILE *in  = fdopen(dup(client_fd), "r");
+FILE *out = fdopen(client_fd, "w");
+
+char line[512];
+while (fgets(line, sizeof(line), in)) {
+    // process `line`, write response via `out`
+    fprintf(out, "...\r\n");
+    fflush(out);
+}
+fclose(in);   // closes the dup; fclose(out) closes client_fd
+```
+
+`dup` is needed because `fclose` closes the underlying fd — without it, closing `in` would also close `client_fd`, making `out` unusable.
+
+Alternatively, read byte-by-byte with raw `read()` exactly as in C, or wrap in `std::unique_ptr<FILE, decltype(&fclose)>` for RAII cleanup.
+
+---
+
+### Python
+
+```python
+import socket
+
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+server.bind(("0.0.0.0", port))
+server.listen(8)
+
+while True:
+    conn, _ = server.accept()
+    with conn:
+        handle_client(conn)
+```
+
+Inside `handle_client`, call `conn.makefile("rb")` to get a buffered binary file object. `readline()` reads one line at a time (up to and including `\n`), and `read(n)` reads exactly `n` bytes.
+
+```python
+def handle_client(conn):
+    f = conn.makefile("rb")
+    while True:
+        line = f.readline()
+        if not line:
+            break
+        # process line, send response
+        conn.sendall(b"...\r\n")
+```
+
+**Gotcha**: do not mix `conn.recv` and `makefile` on the same socket — the buffered reader may have already consumed bytes that `recv` would otherwise return. Pick one approach and stick to it.
+
+---
+
+### Rust
+
+`TcpListener::bind` returns a listener; iterating `listener.incoming()` yields one `TcpStream` per accepted connection. Wrap the stream in `BufReader` for efficient line-oriented reads, and `try_clone` it for a separate write handle.
+
+```rust
+use std::io::{BufRead, BufReader, Write};
+use std::net::{TcpListener, TcpStream};
+
+pub fn start(&mut self, port: u16) {
+    let listener = TcpListener::bind(("0.0.0.0", port)).unwrap();
+    for stream in listener.incoming() {
+        self.handle_client(stream.unwrap());
+    }
+}
+
+fn handle_client(&mut self, stream: TcpStream) {
+    let mut writer = stream.try_clone().unwrap();
+    let mut reader = BufReader::new(stream);
+
+    let mut line = String::new();
+    while reader.read_line(&mut line).unwrap_or(0) > 0 {
+        // `line` includes the trailing \n (and \r before it if present)
+        line.clear();
+        writer.write_all(b"...\r\n").unwrap();
+    }
+}
+```
+
+`try_clone` is required because `BufReader` takes ownership of the stream — you need a separate handle to write back to the same connection.
+
+For reading an exact number of bytes (rather than a line), use `Read::read_exact`:
+
+```rust
+use std::io::Read;
+
+let mut buf = vec![0u8; n];
+reader.read_exact(&mut buf).unwrap();
+```
+
+**Error handling**: prefer `io::Result<()>` as the return type of `handle_client` and propagate errors with `?` so a disconnected client unwinds cleanly instead of panicking.

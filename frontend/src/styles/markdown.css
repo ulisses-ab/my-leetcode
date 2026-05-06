@@ -1,12 +1,14 @@
 @import "github-markdown-css/github-markdown-dark.css";
 
+/* All colors here resolve to tokens defined in globals.css.
+   Do NOT introduce hex literals — change the palette in globals.css instead. */
+
 .markdown-body {
   background: transparent;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   font-size: 13.5px;
   line-height: 1.75;
-  color: #b9b9b9;
-  color: oklch(0.80 0 0);
+  color: var(--bb-muted-strong);
 }
 
 /* Headings */
@@ -14,16 +16,17 @@
 .markdown-body h2,
 .markdown-body h3,
 .markdown-body h4 {
-  font-family: 'Inter', system-ui, sans-serif;
-  color: #f4f4f4;
-  color: oklch(0.95 0 0);
-  font-weight: 600;
+  font-family: 'Silkscreen', 'Inter', system-ui, sans-serif;
+  color: var(--bb-ink);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
   border-bottom: none;
   margin-top: 1.75em;
   margin-bottom: 0.6em;
 }
 
-.markdown-body h1 { font-size: 1.15em; }
+.markdown-body h1 { font-size: 1.2em; }
 .markdown-body h2 { font-size: 1.05em; }
 .markdown-body h3 { font-size: 0.95em; }
 
@@ -31,44 +34,43 @@
 .markdown-body p {
   margin-top: 0;
   margin-bottom: 1em;
-  color: #b4b4b4;
-  color: oklch(0.78 0 0);
+  color: var(--bb-muted-strong);
 }
 
 /* Code blocks */
 .markdown-body pre {
-  background-color: #1e1e1e;
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 8px;
+  background-color: var(--bb-bg-deep);
+  border: 2px solid rgba(var(--bb-accent-rgb), 0.45);
+  border-radius: 0;
   padding: 14px 16px;
   font-size: 12.5px;
   line-height: 1.7;
   overflow-x: auto;
+  font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
 }
 
 .markdown-body pre code {
   background: transparent;
   padding: 0;
   font-size: inherit;
-  color: #bebebe;
-  color: oklch(0.82 0 0);
+  color: var(--bb-ink);
+  font-family: inherit;
 }
 
 /* Inline code */
 .markdown-body code {
-  background-color: rgba(255,255,255,0.07);
-  border: 1px solid rgba(255,255,255,0.09);
-  border-radius: 4px;
+  background-color: rgba(var(--bb-accent-rgb), 0.14);
+  border: 1px solid rgba(var(--bb-accent-rgb), 0.4);
+  border-radius: 0;
   padding: 1px 6px;
   font-size: 12px;
-  color: #bebebe;
-  color: oklch(0.82 0 0);
-  font-family: 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+  color: var(--bb-accent-soft);
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
 }
 
 /* Lists */
 .markdown-body ul {
-  list-style-type: disc;
+  list-style-type: square;
   padding-left: 1.4rem;
   margin-bottom: 1em;
 }
@@ -80,8 +82,11 @@
 
 .markdown-body li {
   margin-bottom: 0.35rem;
-  color: #b4b4b4;
-  color: oklch(0.78 0 0);
+  color: var(--bb-muted-strong);
+}
+
+.markdown-body li::marker {
+  color: var(--bb-accent);
 }
 
 .markdown-body li + li {
@@ -90,14 +95,12 @@
 
 /* Blockquotes */
 .markdown-body blockquote {
-  border-left: 3px solid #424242;
-  border-left: 3px solid oklch(0.40 0 0);
-  background: rgba(255,255,255,0.03);
-  border-radius: 0 6px 6px 0;
+  border-left: 3px solid var(--bb-accent);
+  border-radius: 0;
+  background: rgba(var(--bb-accent-rgb), 0.06);
   padding: 10px 16px;
   margin: 1em 0;
-  color: #7d7d7d;
-  color: oklch(0.65 0 0);
+  color: var(--bb-muted-strong);
 }
 
 .markdown-body blockquote p {
@@ -107,15 +110,14 @@
 
 /* Links */
 .markdown-body a {
-  color: #c5c5c5;
-  color: oklch(0.85 0 0);
+  color: var(--bb-accent);
   text-decoration: none;
+  border-bottom: 1px dashed rgba(var(--bb-accent-rgb), 0.5);
 }
 
 .markdown-body a:hover {
-  color: #f8f8f8;
-  color: oklch(0.97 0 0);
-  text-decoration: underline;
+  color: var(--bb-accent-soft);
+  border-bottom-color: var(--bb-accent-soft);
 }
 
 /* Tables */
@@ -126,37 +128,49 @@
   font-size: 13px;
 }
 
+.markdown-body table tr {
+  background-color: transparent;
+  border-top: 1px solid rgba(var(--bb-accent-rgb), 0.28);
+}
+
+.markdown-body table tr:nth-child(2n) {
+  background-color: rgba(var(--bb-accent-rgb), 0.06);
+}
+
 .markdown-body th {
-  background: rgba(255,255,255,0.05);
-  color: #dadada;
-  color: oklch(0.90 0 0);
-  font-weight: 600;
+  background: rgba(var(--bb-accent-rgb), 0.14);
+  color: var(--bb-ink);
+  font-family: 'Silkscreen', 'Inter', sans-serif;
+  font-weight: 700;
   text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 11px;
   padding: 8px 12px;
-  border: 1px solid rgba(255,255,255,0.09);
+  border: 2px solid rgba(var(--bb-accent-rgb), 0.4);
 }
 
 .markdown-body td {
   padding: 7px 12px;
-  border: 1px solid rgba(255,255,255,0.08);
-  color: #b4b4b4;
-  color: oklch(0.78 0 0);
-}
-
-.markdown-body tr:nth-child(even) td {
-  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(var(--bb-accent-rgb), 0.28);
+  color: var(--bb-muted-strong);
+  background-color: transparent;
 }
 
 /* Horizontal rule */
 .markdown-body hr {
   border: none;
-  border-top: 1px solid rgba(255,255,255,0.09);
+  border-top: 2px solid rgba(var(--bb-accent-rgb), 0.4);
   margin: 1.5em 0;
 }
 
 /* Strong / em */
 .markdown-body strong {
-  color: #dadada;
-  color: oklch(0.90 0 0);
-  font-weight: 600;
+  color: var(--bb-ink);
+  font-weight: 700;
+}
+
+.markdown-body em {
+  color: var(--bb-accent-soft);
+  font-style: italic;
 }

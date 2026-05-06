@@ -6,59 +6,9 @@ export function ProblemDetail() {
   const { id } = useParams<{ id: string }>();
 
   return (
-    <div className="h-screen flex flex-col bg-background overflow-hidden">
+    <div className="h-screen flex flex-col bg-bb-bg overflow-hidden">
       <Navbar />
       <Workspace problemId={id!} />
     </div>
-  )
+  );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

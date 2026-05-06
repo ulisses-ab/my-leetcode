@@ -11,16 +11,19 @@ import { LeaderboardTab } from "./components/LeaderboardTab/LeaderboardTab";
 import { ResourcesTab } from "./components/ResourcesTab/ResourcesTab";
 import { useResources } from "@/api/hooks/resources";
 import { useEffect } from "react";
+import { useSounds } from "@/hooks/useSounds";
+
+const TAB_CLASS = "px-3 h-9 font-sans text-xs uppercase tracking-wide border-b-2 border-transparent text-bb-muted-strong hover:text-bb-ink data-[state=active]:border-bb-accent data-[state=active]:text-bb-accent data-[state=active]:bg-transparent";
 
 export function LeftSide() {
   const problem = useWorkspaceStore((state) => state.problem);
   const leftTab = useWorkspaceStore((state) => state.leftTab);
   const setLeftTab = useWorkspaceStore((state) => state.setLeftTab);
+  const sounds = useSounds();
 
   const { data: resources } = useResources(problem?.id);
   const hasResources = !!resources && resources.length > 0;
 
-  // If the active tab is "resources" but this problem has none, fall back to statement
   useEffect(() => {
     if (leftTab === "resources" && resources !== undefined && !hasResources) {
       setLeftTab("statement");
@@ -31,23 +34,23 @@ export function LeftSide() {
     <div className="h-full flex flex-col">
       <Tabs
         value={leftTab}
-        onValueChange={(value) => setLeftTab(value)}
+        onValueChange={(value) => { sounds.tab(); setLeftTab(value); }}
         className="flex flex-col h-full"
       >
-        <div className="border-b border-border/50 bg-background/30 shrink-0 px-2 pt-1">
+        <div className="border-b-2 border-bb-border/40 bg-bb-bg/40 shrink-0 px-2">
           <TabsList className="bg-transparent gap-0 h-9 p-0">
-            <TabsTrigger value="statement" className="text-xs font-medium px-3 h-9 rounded-none border-b-2 border-transparent data-[state=active]:border-foreground/80 data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=inactive]:text-muted-foreground">
+            <TabsTrigger value="statement" className={TAB_CLASS}>
               Statement
             </TabsTrigger>
             {hasResources && (
-              <TabsTrigger value="resources" className="text-xs font-medium px-3 h-9 rounded-none border-b-2 border-transparent data-[state=active]:border-foreground/80 data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=inactive]:text-muted-foreground">
+              <TabsTrigger value="resources" className={TAB_CLASS}>
                 Resources
               </TabsTrigger>
             )}
-            <TabsTrigger value="submissions" className="text-xs font-medium px-3 h-9 rounded-none border-b-2 border-transparent data-[state=active]:border-foreground/80 data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=inactive]:text-muted-foreground">
+            <TabsTrigger value="submissions" className={TAB_CLASS}>
               Submissions
             </TabsTrigger>
-            <TabsTrigger value="leaderboard" className="text-xs font-medium px-3 h-9 rounded-none border-b-2 border-transparent data-[state=active]:border-foreground/80 data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=inactive]:text-muted-foreground">
+            <TabsTrigger value="leaderboard" className={TAB_CLASS}>
               Leaderboard
             </TabsTrigger>
           </TabsList>

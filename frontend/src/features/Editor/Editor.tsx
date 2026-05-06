@@ -30,7 +30,7 @@ export const Editor = forwardRef<EditorRef, {
   const resetStore = useEditorStore((state) => state.reset);
 
   async function initialize() {
-    const { nodes, rootId } = 
+    const { nodes, rootId } =
       zip ?
         await zipToFileNodes(zip) :
         { nodes: defaultNodes, rootId: "root" };
@@ -38,7 +38,7 @@ export const Editor = forwardRef<EditorRef, {
     initializeStore(persistanceKey, nodes, rootId);
   }
 
-  useEffect(() => {    
+  useEffect(() => {
     initialize();
   }, [persistanceKey])
 
@@ -56,21 +56,25 @@ export const Editor = forwardRef<EditorRef, {
   }), [nodes, rootId]);
 
   return (
-    <ResizablePanelGroup
-      direction="horizontal"
-      className="flex-1 overflow-auto border-none"
-    >
-      <ResizablePanel
-        minSize={8.5}
-        maxSize={50}
-        defaultSize={18}
-      >
-        <FileExplorer />
-      </ResizablePanel>
-      <ResizableHandle className="bg-white/[0.04] w-px hover:bg-white/10 transition-colors" />
-      <ResizablePanel className="bg-[#1e1e1e]">
+    <>
+      {/* Mobile: full-width editor only — Files tab in RightSide handles the explorer */}
+      <div className="flex md:hidden flex-col h-full overflow-hidden">
         <CodeEditor />
-      </ResizablePanel>
-    </ResizablePanelGroup>
-  )
+      </div>
+
+      {/* Desktop: resizable file explorer + editor */}
+      <ResizablePanelGroup
+        direction="horizontal"
+        className="hidden md:flex flex-1 overflow-auto border-none"
+      >
+        <ResizablePanel minSize={8.5} maxSize={80} defaultSize={18}>
+          <FileExplorer />
+        </ResizablePanel>
+        <ResizableHandle className="bg-white/[0.04] w-px hover:bg-white/10 transition-colors" />
+        <ResizablePanel className="bg-[#1e1e1e]">
+          <CodeEditor />
+        </ResizablePanel>
+      </ResizablePanelGroup>
+    </>
+  );
 });

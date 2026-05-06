@@ -15,6 +15,10 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { RotateCcw } from "lucide-react";
+import { playClick, playOpen, playClose, playDelete } from "@/lib/sounds";
+import { useSoundStore } from "@/stores/useSoundStore";
+
+const BTN = "flex items-center gap-1.5 px-2 h-7 border-2 border-bb-border/55 bg-bb-surface/72 font-mono text-[10px] uppercase tracking-[0.12em] text-bb-muted-strong hover:text-bb-accent hover:border-bb-accent transition-colors";
 
 export function UploadDownload() {
   const nodes = useEditorStore((state) => state.nodes);
@@ -54,23 +58,17 @@ export function UploadDownload() {
   return (
     <>
       <div className="flex items-center gap-1">
-        <button
-          className="flex items-center gap-1.5 px-2 py-1 rounded border border-border/40 bg-white/[0.04] text-muted-foreground/70 hover:text-foreground hover:bg-white/[0.08] hover:border-border/70 transition-colors text-xs"
-          onClick={() => setResetOpen(true)}
-          title="Reset to template"
-        >
+        <button className={BTN} onClick={() => { if (useSoundStore.getState().enabled) playOpen(); setResetOpen(true); }} title="Reset to template">
           <RotateCcw size={11} aria-hidden="true" />
           Reset
         </button>
 
-        <button
-          className="flex items-center gap-1.5 px-2 py-1 rounded border border-border/40 bg-white/[0.04] text-muted-foreground/70 hover:text-foreground hover:bg-white/[0.08] hover:border-border/70 transition-colors text-xs"
-          onClick={handleDownload}
-          title="Export as ZIP"
-        >
-          <FaDownload size={11} aria-hidden="true" />
-          Export
-        </button>
+        <span className="hidden sm:contents">
+          <button className={BTN} onClick={() => { if (useSoundStore.getState().enabled) playClick(); handleDownload(); }} title="Export as ZIP">
+            <FaDownload size={11} aria-hidden="true" />
+            Export
+          </button>
+        </span>
 
         <input
           type="file"
@@ -80,33 +78,34 @@ export function UploadDownload() {
           style={{ display: "none" }}
         />
 
-        <button
-          className="flex items-center gap-1.5 px-2 py-1 rounded border border-border/40 bg-white/[0.04] text-muted-foreground/70 hover:text-foreground hover:bg-white/[0.08] hover:border-border/70 transition-colors text-xs"
-          onClick={handleUploadClick}
-          title="Import ZIP"
-        >
-          <FaUpload size={11} aria-hidden="true" />
-          Import
-        </button>
+        <span className="hidden sm:contents">
+          <button className={BTN} onClick={() => { if (useSoundStore.getState().enabled) playClick(); handleUploadClick(); }} title="Import ZIP">
+            <FaUpload size={11} aria-hidden="true" />
+            Import
+          </button>
+        </span>
       </div>
 
       <Dialog open={resetOpen} onOpenChange={setResetOpen}>
-        <DialogContent className="max-w-sm sm:max-w-lg border-border/50 bg-card">
+        <DialogContent className="max-w-sm sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle className="text-sm font-medium">Reset to template?</DialogTitle>
-            <DialogDescription className="text-xs text-muted-foreground">
+            <DialogTitle>Reset to template?</DialogTitle>
+            <DialogDescription className="font-sans text-xs text-bb-muted-strong">
               This will discard all your changes and restore the original template files for this setup. This cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-2">
             <DialogClose asChild>
-              <button className="flex-1 px-3 py-1.5 text-xs rounded border border-border/50 text-muted-foreground hover:bg-white/[0.05] hover:text-foreground transition-colors">
+              <button
+                onClick={() => { if (useSoundStore.getState().enabled) playClose(); }}
+                className="flex-1 px-3 h-9 border-2 border-bb-border/55 bg-bb-surface/72 font-sans text-xs uppercase tracking-wide text-bb-muted-strong hover:text-bb-ink hover:border-bb-border transition-colors"
+              >
                 Cancel
               </button>
             </DialogClose>
             <button
-              onClick={handleReset}
-              className="flex-1 px-3 py-1.5 text-xs rounded border border-amber-500/30 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 transition-colors"
+              onClick={() => { if (useSoundStore.getState().enabled) playDelete(); handleReset(); }}
+              className="flex-1 px-3 h-9 border-2 border-bb-warning/60 bg-bb-warning/15 font-sans text-xs uppercase tracking-wide text-bb-warning hover:bg-bb-warning/25 transition-colors"
             >
               Reset
             </button>

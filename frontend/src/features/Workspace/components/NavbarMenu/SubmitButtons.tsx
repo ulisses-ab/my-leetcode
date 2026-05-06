@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { MdCloudUpload } from "react-icons/md";
 import { useCallback, useEffect, useState } from "react";
 import { useWorkspaceStore } from "../../store";
@@ -6,6 +5,9 @@ import { usePostSubmission, useProblemLatestSubmission } from "@/api/hooks/submi
 import { Loader2 } from "lucide-react";
 import { useAuthStore } from "@/features/auth/store";
 import { SignInDialog } from "@/features/auth/SignInDialog";
+import { useSounds } from "@/hooks/useSounds";
+
+const BASE = "w-full h-9 inline-flex items-center justify-center gap-2 border-2 font-sans text-xs uppercase tracking-wide transition-colors";
 
 export function SubmitButtons() {
   const editorRef = useWorkspaceStore(state => state.editor);
@@ -20,6 +22,7 @@ export function SubmitButtons() {
     isAuthenticated ? (problem?.id ?? null) : null
   );
   const { mutateAsync: postSubmission, isPending: isSubmitting } = usePostSubmission(problem?.id!);
+  const sounds = useSounds();
 
   const [isSubmissionEvaluating, setIsSubmissionEvaluating] = useState(false);
   const [justSubmitted, setJustSubmitted] = useState(false);
@@ -27,6 +30,7 @@ export function SubmitButtons() {
   const handleSubmit = useCallback(async () => {
     if (!editorRef || !problem || !setup) return;
 
+    sounds.submit();
     setJustSubmitted(true);
     try {
       const zipFile = await editorRef.getCurrentZip();
@@ -55,19 +59,25 @@ export function SubmitButtons() {
 
     if (isSubmissionEvaluating) {
       onSubmissionFinished(latestSubmission!);
+      if (latestSubmission?.status === "ACCEPTED") {
+        sounds.success();
+      } else {
+        sounds.error();
+      }
     }
   }, [latestSubmission, latestSubmissionFetched]);
 
   if (!isAuthenticated) {
     return (
       <SignInDialog>
-        <Button
-          className="w-full !bg-emerald-500/25 border-emerald-500/30 text-emerald-300 hover:!bg-emerald-500/35 hover:border-emerald-500/50 hover:text-emerald-200 transition-none"
-          variant="outline"
+        <button
+          type="button"
+          onClick={() => { if (useSoundStore.getState().enabled) playOpen(); }}
+          className={`${BASE} border-bb-success/60 bg-bb-success/15 text-bb-success hover:border-bb-success hover:bg-bb-success/25`}
         >
           <span className="hidden sm:inline">Submit</span>
-          <MdCloudUpload />
-        </Button>
+          <MdCloudUpload size={14} />
+        </button>
       </SignInDialog>
     );
   }
@@ -77,24 +87,24 @@ export function SubmitButtons() {
 
   if (isPending) {
     return (
-      <Button
-        onClick={() => {}}
-        className="w-full bg-white/[0.04] cursor-default border-border/50 text-muted-foreground hover:text-muted-foreground hover:border-border/50 hover:bg-white/[0.04] transition-none"
-        variant="outline"
+      <button
+        type="button"
+        disabled
+        className={`${BASE} border-bb-border/50 bg-bb-surface text-bb-muted-strong cursor-default`}
       >
-        Pending <Loader2 className="animate-spin"/>
-      </Button>
+        Pending <Loader2 size={14} className="animate-spin" />
+      </button>
     );
   }
 
   return (
-    <Button
+    <button
+      type="button"
       onClick={handleSubmit}
-      className="w-full !bg-emerald-500/25 border-emerald-500/30 text-emerald-300 hover:!bg-emerald-500/35 hover:border-emerald-500/50 hover:text-emerald-200 transition-none"
-      variant="outline"
+      className={`${BASE} border-bb-success/60 bg-bb-success/15 text-bb-success hover:border-bb-success hover:bg-bb-success/25`}
     >
       Submit
-      <MdCloudUpload />
-    </Button>
+      <MdCloudUpload size={14} />
+    </button>
   );
 }

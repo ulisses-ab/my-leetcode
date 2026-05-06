@@ -85,9 +85,9 @@ export function NodeContent({ node }: {
       {node.isInternal ? (
         <>
           {node.isOpen ? (
-            <ChevronDown size={14} className="text-muted-foreground/50 shrink-0" />
+            <ChevronDown size={14} className="text-bb-muted shrink-0" />
           ) : (
-            <ChevronRight size={14} className="text-muted-foreground/50 shrink-0" />
+            <ChevronRight size={14} className="text-bb-muted shrink-0" />
           )}
         </>
       ) : (
@@ -110,9 +110,10 @@ export function NodeContent({ node }: {
             submitRename();
           });
         }}
+        data-rename-input={node.data.id}
         hidden={!isRenaming}
         onClick={(e) => e.stopPropagation()}
-        className="px-1 py-0 border flex-1 min-w-0 border-indigo-500/60 rounded outline-none bg-[#141414] text-foreground text-sm"
+        className="px-1 py-0 border-2 flex-1 min-w-0 border-bb-accent/70 outline-none bg-bb-bg-deep text-bb-ink text-sm"
       />
 
       <span hidden={isRenaming}>{node.data.name}</span>

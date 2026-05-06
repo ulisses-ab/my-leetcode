@@ -48,7 +48,12 @@ const worker = new Worker(
       return "done";
     }
   },
-  { connection }
+  {
+    connection,
+    streams: {
+      events: { maxLen: 0 },
+    },
+  }
 );
 
 worker.on("completed", (job) => {

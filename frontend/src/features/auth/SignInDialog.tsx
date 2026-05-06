@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useOAuth } from "@/api/hooks/oauth";
-import { FaGoogle, FaGithub } from "react-icons/fa";
+import { FaGoogle } from "react-icons/fa";
 import {
   Dialog,
   DialogContent,
@@ -17,15 +17,15 @@ interface SignInDialogProps {
 }
 
 export function SignInDialog({ children }: SignInDialogProps) {
-  const { google, github } = useOAuth();
+  const { google } = useOAuth();
 
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>Sign In</DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="font-mono text-[10px] uppercase tracking-[0.16em] text-bb-muted-strong">
             Choose your preferred login method
           </DialogDescription>
         </DialogHeader>
@@ -34,28 +34,19 @@ export function SignInDialog({ children }: SignInDialogProps) {
           <Button
             variant="outline"
             onClick={google}
-            className="w-full flex items-center justify-center gap-2.5 h-10 border-border/60 bg-card/50 hover:bg-card transition-colors"
+            className="w-full h-11"
           >
             <FaGoogle className="w-4 h-4" />
-            <span className="text-sm">Continue with Google</span>
+            <span>Continue with Google</span>
           </Button>
-
-          {/*<Button
-            variant="outline"
-            onClick={github}
-            className="w-full flex items-center justify-center gap-2.5 h-10 border-border/60 bg-card/50 hover:bg-card transition-colors"
-          >
-            <FaGithub className="w-4 h-4" />
-            <span className="text-sm">Continue with GitHub</span>
-          </Button>*/}
         </div>
 
         <DialogFooter className="sm:justify-start">
-          <DialogDescription>
+          <DialogDescription className="font-sans text-[11px] text-bb-muted-strong">
             By signing in you accept our{' '}
-            <Link to="/terms" className="text-blue-400 underline hover:text-blue-600">Terms of Service</Link> 
+            <Link to="/terms" className="text-bb-accent underline underline-offset-2 decoration-dashed hover:text-bb-accent-soft">Terms of Service</Link>
             {' '}and{' '}
-            <Link to="/privacy" className="text-blue-400 underline hover:text-blue-600">Privacy Policy</Link>
+            <Link to="/privacy" className="text-bb-accent underline underline-offset-2 decoration-dashed hover:text-bb-accent-soft">Privacy Policy</Link>
           </DialogDescription>
         </DialogFooter>
       </DialogContent>

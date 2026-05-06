@@ -1,5 +1,7 @@
 import { TbFolderPlus, TbFilePlus } from "react-icons/tb";
 import { useEditorStore } from "../../../store/store";
+import { playClick } from "@/lib/sounds";
+import { useSoundStore } from "@/stores/useSoundStore";
 
 export function AddNodeButton({ type }: { type: "folder" | "file" }) {
   const nodes = useEditorStore((state) => state.nodes);
@@ -11,6 +13,7 @@ export function AddNodeButton({ type }: { type: "folder" | "file" }) {
   const handleAdd = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (renamingNodeId) return;
+    if (useSoundStore.getState().enabled) playClick();
 
     const selectedNode = 
       selectedNodeId ?
@@ -28,7 +31,7 @@ export function AddNodeButton({ type }: { type: "folder" | "file" }) {
   return (
     <button
       onClick={handleAdd}
-      className="flex items-center gap-1 p-1 rounded text-muted-foreground/40 hover:text-muted-foreground hover:bg-white/[0.06] transition-colors"
+      className="flex items-center gap-1 p-1 text-bb-muted-strong hover:text-bb-accent hover:bg-bb-accent/10 transition-colors"
       title={type === "file" ? "New file" : "New folder"}
     >
       {type === "file" ? (

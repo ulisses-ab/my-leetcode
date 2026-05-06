@@ -6,5 +6,8 @@ dotenv.config();
 export const queue = new Queue("execution-queue", {
   connection: {
     url: process.env.REDIS_URL!
-  }
+  },
+  streams: {
+    events: { maxLen: 0 },
+  },
 });

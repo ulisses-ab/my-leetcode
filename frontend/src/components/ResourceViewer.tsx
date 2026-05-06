@@ -18,10 +18,10 @@ export function ResourceViewer({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton
-        className="!inset-0 !translate-x-0 !translate-y-0 !max-w-none !w-screen !h-screen !rounded-none !border-0 flex flex-col gap-0 p-0 bg-background"
+        className="!inset-0 !translate-x-0 !translate-y-0 !max-w-none !w-screen !h-screen !shadow-none !border-0 flex flex-col gap-0 p-0 bg-bb-bg"
       >
-        <div className="px-8 pt-6 pb-4 border-b border-border/40 shrink-0">
-          <DialogTitle className="text-lg font-semibold text-foreground/90 leading-snug">
+        <div className="px-8 pt-6 pb-4 border-b-2 border-bb-border/40 shrink-0">
+          <DialogTitle className="bb-text-depth-sm font-display text-lg uppercase tracking-tight text-bb-ink leading-snug">
             {resource.title}
           </DialogTitle>
         </div>

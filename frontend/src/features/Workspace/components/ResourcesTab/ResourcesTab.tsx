@@ -6,6 +6,8 @@ import remarkGfm from "remark-gfm";
 import { BookOpen, ChevronLeft, ChevronRight, Loader2, Maximize2 } from "lucide-react";
 import type { Resource } from "@/types/Resource";
 import { ResourceViewer } from "@/components/ResourceViewer";
+import { playEnter, playClose, playOpen } from "@/lib/sounds";
+import { useSoundStore } from "@/stores/useSoundStore";
 
 function ResourceList({
   resources,
@@ -16,27 +18,29 @@ function ResourceList({
 }) {
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between px-5 py-3 border-b border-border/30 shrink-0">
-        <span className="text-sm font-medium text-foreground/80">Resources</span>
-        <span className="text-xs text-muted-foreground/40 tabular-nums">{resources.length}</span>
+      <div className="flex items-center justify-between px-5 py-3 border-b-2 border-bb-border/40 shrink-0">
+        <span className="font-display text-sm uppercase tracking-tight text-bb-ink">Resources</span>
+        <span className="font-mono text-[11px] tabular-nums text-bb-muted-strong">
+          {String(resources.length).padStart(2, "0")}
+        </span>
       </div>
 
       <div className="flex-1 overflow-y-auto">
         {resources.map((resource, idx) => (
           <button
             key={resource.id}
-            onClick={() => onSelect(resource)}
-            className="group w-full flex items-center gap-3 px-5 py-3.5 border-b border-border/25 last:border-0 hover:bg-white/[0.03] transition-colors text-left"
+            onClick={() => { if (useSoundStore.getState().enabled) playEnter(); onSelect(resource); }}
+            className="group w-full flex items-center gap-3 px-5 py-3.5 border-b-2 border-bb-border/30 last:border-0 hover:bg-bb-accent/5 transition-colors text-left"
           >
-            <span className="text-[11px] font-mono text-muted-foreground/25 w-4 shrink-0 text-right tabular-nums">
-              {idx + 1}
+            <span className="font-mono text-[10px] tabular-nums text-bb-muted w-5 shrink-0 text-right">
+              {String(idx + 1).padStart(2, "0")}
             </span>
-            <span className="flex-1 text-sm text-foreground/70 group-hover:text-foreground/90 transition-colors font-medium leading-snug">
+            <span className="flex-1 font-sans text-sm text-bb-ink group-hover:text-bb-accent transition-colors leading-snug">
               {resource.title}
             </span>
             <ChevronRight
               size={13}
-              className="text-muted-foreground/25 group-hover:text-muted-foreground/50 shrink-0 transition-colors"
+              className="text-bb-muted group-hover:text-bb-accent shrink-0 transition-colors"
             />
           </button>
         ))}
@@ -65,25 +69,25 @@ function ResourceReader({
   return (
     <>
       <div className="flex flex-col h-full">
-        <div className="flex items-center justify-between px-4 py-2.5 border-b border-border/30 shrink-0">
+        <div className="flex items-center justify-between px-4 py-2.5 border-b-2 border-bb-border/40 shrink-0">
           <button
-            onClick={onBack}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-md text-sm font-medium text-foreground/70 hover:text-foreground hover:bg-white/[0.07] transition-colors"
+            onClick={() => { if (useSoundStore.getState().enabled) playClose(); onBack(); }}
+            className="flex items-center gap-1 px-2.5 py-1.5 border-2 border-bb-border/55 bg-bb-surface/72 font-sans text-xs uppercase tracking-wide text-bb-ink hover:text-bb-accent hover:border-bb-accent transition-colors"
           >
-            <ChevronLeft size={16} strokeWidth={2.5} />
+            <ChevronLeft size={14} strokeWidth={2.5} />
             Resources
           </button>
           <button
-            onClick={() => setFullscreen(true)}
-            className="flex items-center justify-center w-6 h-6 rounded text-muted-foreground/40 hover:text-foreground/70 hover:bg-white/[0.06] transition-colors"
+            onClick={() => { if (useSoundStore.getState().enabled) playOpen(); setFullscreen(true); }}
+            className="flex items-center justify-center w-7 h-7 border-2 border-bb-border/55 bg-bb-surface/72 text-bb-muted-strong hover:text-bb-accent hover:border-bb-accent transition-colors"
             title="Open fullscreen"
           >
-            <Maximize2 size={16} />
+            <Maximize2 size={14} />
           </button>
         </div>
 
         <div className="flex-1 overflow-y-auto px-5 pt-5 pb-20">
-          <h2 className="text-2xl font-semibold text-foreground/90 mb-5 leading-snug">
+          <h2 className="bb-text-depth-sm font-display text-2xl uppercase text-bb-ink mb-5 leading-snug tracking-tight">
             {resource.title}
           </h2>
           <MarkdownContent content={resource.content} />
@@ -102,18 +106,18 @@ export function ResourcesTab() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-48 gap-2 text-muted-foreground/40">
+      <div className="flex items-center justify-center h-48 gap-2 text-bb-muted-strong">
         <Loader2 size={16} className="animate-spin" />
-        <span className="text-xs">Loading…</span>
+        <span className="font-mono text-[10px] uppercase tracking-[0.18em]">Loading…</span>
       </div>
     );
   }
 
   if (!resources || resources.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-48 gap-3 text-muted-foreground/40">
+      <div className="flex flex-col items-center justify-center h-48 gap-3 text-bb-muted-strong">
         <BookOpen size={28} strokeWidth={1.5} />
-        <p className="text-xs">No resources yet.</p>
+        <p className="font-mono text-[10px] uppercase tracking-[0.18em]">No resources yet.</p>
       </div>
     );
   }

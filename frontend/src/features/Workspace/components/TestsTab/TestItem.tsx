@@ -7,8 +7,10 @@ import { useState } from "react";
 import { stringifyObject } from "./stringifyObject";
 import { cn } from "@/lib/utils";
 import { Copy, Check, Lock } from "lucide-react";
+import { playCopy } from "@/lib/sounds";
+import { useSoundStore } from "@/stores/useSoundStore";
 
-const DEFAULT_CODE_BLOCK_HEIGHT = 128; // px — matches old max-h-32
+const DEFAULT_CODE_BLOCK_HEIGHT = 128;
 const MIN_CODE_BLOCK_HEIGHT = 60;
 
 type StatusConfig = {
@@ -25,41 +27,41 @@ function getStatusConfig(status: string): StatusConfig {
   switch (status) {
     case "ACCEPTED":
       return {
-        container: "border-emerald-500/20 bg-emerald-500/[0.03]",
+        container: "border-bb-success/60 bg-bb-success/[0.05]",
         label: "Accepted",
-        labelClass: "text-emerald-400",
+        labelClass: "text-bb-success",
         errorBorder: "", errorBg: "", errorLabel: "", errorText: "",
       };
     case "REJECTED":
       return {
-        container: "border-rose-500/20 bg-rose-500/[0.03]",
+        container: "border-bb-error/60 bg-bb-error/[0.05]",
         label: "Wrong Answer",
-        labelClass: "text-rose-400",
+        labelClass: "text-bb-error",
         errorBorder: "", errorBg: "", errorLabel: "", errorText: "",
       };
     case "TLE":
       return {
-        container: "border-amber-500/20 bg-amber-500/[0.03]",
+        container: "border-bb-warning/60 bg-bb-warning/[0.05]",
         label: "Time Limit",
-        labelClass: "text-amber-400",
-        errorBorder: "border-amber-500/15",
-        errorBg: "bg-amber-500/[0.04]",
-        errorLabel: "text-amber-400/60",
-        errorText: "text-amber-300/80",
+        labelClass: "text-bb-warning",
+        errorBorder: "border-bb-warning/40",
+        errorBg: "bg-bb-warning/[0.08]",
+        errorLabel: "text-bb-warning",
+        errorText: "text-bb-warning",
       };
     case "FAILED":
       return {
-        container: "border-amber-500/20 bg-amber-500/[0.03]",
+        container: "border-bb-warning/60 bg-bb-warning/[0.05]",
         label: "Error",
-        labelClass: "text-amber-400",
-        errorBorder: "border-amber-500/15",
-        errorBg: "bg-amber-500/[0.04]",
-        errorLabel: "text-amber-400/60",
-        errorText: "text-amber-300/80",
+        labelClass: "text-bb-warning",
+        errorBorder: "border-bb-warning/40",
+        errorBg: "bg-bb-warning/[0.08]",
+        errorLabel: "text-bb-warning",
+        errorText: "text-bb-warning",
       };
     default:
       return {
-        container: "border-border/50",
+        container: "border-bb-border/55",
         label: "",
         labelClass: "",
         errorBorder: "", errorBg: "", errorLabel: "", errorText: "",
@@ -117,18 +119,18 @@ export function TestItem({
     <AccordionItem
       value={`testcase-${index}`}
       className={cn(
-        "group rounded-xl border bg-card/40 transition-colors duration-150",
+        "group border-2 bg-bb-surface/40 transition-colors duration-150",
         status.container
       )}
     >
-      <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-transparent [&>svg]:text-muted-foreground/40">
+      <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-transparent [&>svg]:text-bb-muted-strong">
         <div className="flex w-full items-center justify-between pr-2">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-medium text-foreground/80">
-              Case {index + 1}
+            <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-bb-muted-strong">
+              Case {String(index + 1).padStart(2, "0")}
             </span>
             {isHidden && (
-              <span className="flex items-center gap-1 text-[10px] text-muted-foreground/40">
+              <span className="flex items-center gap-1 font-mono text-[10px] text-bb-muted">
                 <Lock size={9} />
                 hidden
               </span>
@@ -137,14 +139,14 @@ export function TestItem({
 
           <div className="flex items-center gap-3">
             {hasStats && (
-              <span className="text-[10px] font-mono tabular-nums text-muted-foreground/35">
+              <span className="font-mono text-[10px] tabular-nums text-bb-muted">
                 {results.time_ms != null && `${Math.round(results.time_ms)} ms`}
                 {results.time_ms != null && results.memory_kb != null && " · "}
                 {results.memory_kb != null && `${results.memory_kb} KB`}
               </span>
             )}
             {results?.status && (
-              <span className={cn("text-xs font-medium", status.labelClass)}>
+              <span className={cn("font-mono text-[10px] uppercase tracking-[0.16em]", status.labelClass)}>
                 {status.label}
               </span>
             )}
@@ -162,11 +164,11 @@ export function TestItem({
         ) : (<>
           <div className="space-y-3">
             {hasError && (
-              <div className={cn("rounded-lg border p-3", status.errorBorder, status.errorBg)}>
-                <p className={cn("text-[10px] uppercase tracking-widest font-medium mb-1.5", status.errorLabel)}>
+              <div className={cn("border-2 p-3", status.errorBorder, status.errorBg)}>
+                <p className={cn("font-mono text-[10px] uppercase tracking-[0.16em] mb-1.5", status.errorLabel)}>
                   {results.errorType ?? "Error"}
                 </p>
-                <pre className={cn("text-xs font-mono whitespace-pre-wrap leading-relaxed", status.errorText)}>
+                <pre className={cn("font-mono text-xs whitespace-pre-wrap leading-relaxed", status.errorText)}>
                   {results.error}
                 </pre>
               </div>
@@ -189,14 +191,13 @@ export function TestItem({
             {results?.stdout && (
               <CodeBlock title="Stdout" content={results.stdout} maxHeight={codeBlockHeight} mono />
             )}
-
           </div>
           <div
             onMouseDown={startResize}
             onTouchStart={startResize}
-            className="group-data-[state=closed]:hidden mt-3 h-3 flex items-center justify-center cursor-row-resize rounded-b-xl"
+            className="group-data-[state=closed]:hidden mt-3 h-3 flex items-center justify-center cursor-row-resize"
           >
-            <div className="w-6 h-px rounded-full bg-white/[0.10] group-hover:bg-white/[0.22] transition-colors" />
+            <div className="w-8 h-0.5 bg-bb-border/40 group-hover:bg-bb-accent transition-colors" />
           </div>
         </>)}
       </AccordionContent>
@@ -207,12 +208,12 @@ export function TestItem({
 function HiddenBlock({ title }: { title: string }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <span className="text-[10px] uppercase tracking-widest text-muted-foreground/40 font-medium">
+      <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-bb-muted-strong">
         {title}
       </span>
-      <div className="rounded-lg border border-border/50 bg-background/40 p-3 flex items-center gap-1.5 text-muted-foreground/25">
+      <div className="border-2 border-bb-border/40 bg-bb-bg/40 p-3 flex items-center gap-1.5 text-bb-muted">
         <Lock size={10} />
-        <span className="text-xs italic">hidden</span>
+        <span className="font-mono text-xs italic">hidden</span>
       </div>
     </div>
   );
@@ -236,46 +237,47 @@ function CodeBlock({
   const handleCopy = async () => {
     if (!content) return;
     await navigator.clipboard.writeText(content);
+    if (useSoundStore.getState().enabled) playCopy();
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   };
 
   const borderClass =
     highlight === "correct"
-      ? "border-emerald-500/25"
+      ? "border-bb-success/60"
       : highlight === "wrong"
-      ? "border-rose-500/25"
-      : "border-border/50";
+      ? "border-bb-error/60"
+      : "border-bb-border/45";
 
   return (
     <div className="flex flex-col gap-1.5">
-      <span className="text-[10px] uppercase tracking-widest text-muted-foreground/40 font-medium">
+      <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-bb-muted-strong">
         {title}
       </span>
 
-      <div className={cn("relative group rounded-lg border bg-background/40", borderClass)}>
+      <div className={cn("relative group border-2 bg-bb-bg/50", borderClass)}>
         <div className="overflow-y-auto p-3" style={{ maxHeight }}>
           {content ? (
             <pre
               className={cn(
                 "text-xs whitespace-pre-wrap leading-relaxed",
                 mono ? "font-mono" : "font-sans",
-                highlight === "correct" && "text-emerald-300/90",
-                highlight === "wrong" && "text-rose-300/90",
-                !highlight && "text-foreground/75"
+                highlight === "correct" && "text-bb-success",
+                highlight === "wrong" && "text-bb-error",
+                !highlight && "text-bb-ink"
               )}
             >
               {content}
             </pre>
           ) : (
-            <span className="text-xs text-muted-foreground/25 italic">—</span>
+            <span className="text-xs text-bb-muted italic">—</span>
           )}
         </div>
 
         {content && (
           <button
             onClick={handleCopy}
-            className="absolute top-2 right-2 flex items-center gap-1 px-1.5 py-1 rounded text-muted-foreground/40 hover:text-muted-foreground hover:bg-white/[0.06] opacity-0 group-hover:opacity-100 transition-all"
+            className="absolute top-2 right-3 flex items-center gap-1 px-1.5 py-1 border-2 border-bb-border/40 bg-bb-bg/70 text-bb-muted hover:text-bb-accent hover:border-bb-accent opacity-0 group-hover:opacity-100 transition-all"
           >
             {copied ? <Check size={11} /> : <Copy size={11} />}
           </button>

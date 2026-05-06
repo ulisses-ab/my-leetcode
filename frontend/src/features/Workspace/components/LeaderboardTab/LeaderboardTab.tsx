@@ -4,7 +4,7 @@ import type { LeaderboardRow } from "@/api/functions/submissions";
 import { Clock, Cpu, Loader2, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const RANK_COLORS = ["text-amber-400", "text-slate-400", "text-amber-700"];
+const RANK_COLORS = ["text-bb-warning", "text-bb-muted-strong", "text-bb-warning/60"];
 
 function RankBadge({ rank }: { rank: number }) {
   if (rank <= 3) {
@@ -17,7 +17,7 @@ function RankBadge({ rank }: { rank: number }) {
     );
   }
   return (
-    <span className="text-[10px] font-mono text-muted-foreground/40 w-3 text-center">
+    <span className="font-mono text-[10px] text-bb-muted w-3 text-center">
       {rank}
     </span>
   );
@@ -37,16 +37,16 @@ function LeaderboardTable({
   format: (v: number) => string;
 }) {
   return (
-    <div className="rounded-lg border border-border/40 overflow-hidden">
-      <div className="flex items-center gap-1.5 px-3 py-2 border-b border-border/30 bg-white/[0.02]">
-        <span className="text-muted-foreground/50">{icon}</span>
-        <span className="text-[10px] uppercase tracking-widest font-medium text-muted-foreground/50">
+    <div className="border-2 border-bb-border/45 overflow-hidden">
+      <div className="flex items-center gap-1.5 px-3 py-2 border-b-2 border-bb-border/30 bg-bb-bg/50">
+        <span className="text-bb-muted-strong">{icon}</span>
+        <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-bb-muted-strong">
           {label}
         </span>
       </div>
 
       {rows.length === 0 ? (
-        <p className="text-xs text-muted-foreground/30 px-3 py-4 text-center">
+        <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-bb-muted px-3 py-4 text-center">
           No data yet
         </p>
       ) : (
@@ -54,16 +54,16 @@ function LeaderboardTable({
           {rows.map((row) => (
             <div
               key={row.submissionId}
-              className="flex items-center gap-2.5 px-3 py-2 border-b border-border/20 last:border-0 hover:bg-white/[0.025] transition-colors"
+              className="flex items-center gap-2.5 px-3 py-2 border-b-2 border-bb-border/20 last:border-0 hover:bg-bb-accent/5 transition-colors"
             >
               <RankBadge rank={row.rank} />
-              <span className="flex-1 text-xs text-foreground/80 font-medium truncate">
+              <span className="flex-1 font-sans text-xs text-bb-ink truncate">
                 {row.userHandle}
               </span>
-              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/[0.05] text-muted-foreground/60 border border-white/[0.06] shrink-0">
+              <span className="font-mono text-[10px] uppercase tracking-[0.12em] px-1.5 py-0.5 bg-bb-bg/40 text-bb-muted-strong border-2 border-bb-border/40 shrink-0">
                 {row.language}
               </span>
-              <span className="text-xs font-mono font-semibold text-foreground/70 shrink-0 tabular-nums">
+              <span className="font-mono text-xs text-bb-ink shrink-0 tabular-nums">
                 {row[metric] !== null ? format(row[metric]!) : "—"}
               </span>
             </div>
@@ -81,18 +81,18 @@ export function LeaderboardTab() {
 
   if (!problem || !setup) {
     return (
-      <div className="flex flex-col items-center justify-center h-48 gap-3 text-muted-foreground/40">
+      <div className="flex flex-col items-center justify-center h-48 gap-3 text-bb-muted-strong">
         <Trophy size={28} strokeWidth={1.5} />
-        <p className="text-xs">Select a language to see rankings</p>
+        <p className="font-mono text-[10px] uppercase tracking-[0.18em]">Select a language to see rankings</p>
       </div>
     );
   }
 
   if (isLoading || !data) {
     return (
-      <div className="flex items-center justify-center h-48 gap-2 text-muted-foreground/40">
+      <div className="flex items-center justify-center h-48 gap-2 text-bb-muted-strong">
         <Loader2 size={16} className="animate-spin" />
-        <span className="text-xs">Loading…</span>
+        <span className="font-mono text-[10px] uppercase tracking-[0.18em]">Loading…</span>
       </div>
     );
   }

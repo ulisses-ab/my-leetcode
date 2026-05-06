@@ -28,8 +28,8 @@ export function EditorContainer() {
   }
 
   if (!template || !isSuccess) {
-    return <div className="flex w-full h-full items-center justify-center">
-      <Loader2 className="animate-spin w-10 h-10"/>
+    return <div className="flex w-full h-full items-center justify-center bg-bb-surface text-bb-muted-strong">
+      <Loader2 className="animate-spin w-8 h-8"/>
     </div>
   }
 

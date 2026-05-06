@@ -11,7 +11,6 @@ interface WorkspaceState {
   editor: EditorRef | null;
   rightTab: string;
   leftTab: string;
-
   selectedSubmission: Submission | null;
   submissionResults: any;
 
@@ -67,7 +66,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
     setRightTab(tab) {
       set({ rightTab: tab });
     },
-    
+
     setLeftTab(tab) {
       set({ leftTab: tab });
     },

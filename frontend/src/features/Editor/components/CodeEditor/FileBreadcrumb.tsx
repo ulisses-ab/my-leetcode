@@ -33,8 +33,8 @@ export function FileBreadcrumb() {
   )
 
   return (
-    <Breadcrumb className="h-8 flex items-center px-3 bg-[#1e1e1e] border-b border-white/[0.06] text-[11px]">
-      <BreadcrumbList className="text-muted-foreground/50">
+    <Breadcrumb className="h-9 flex items-center px-3 bg-bb-surface border-b-2 border-bb-border/40 font-mono text-[10px] tracking-[0.04em]">
+      <BreadcrumbList className="text-bb-muted-strong">
         {ancestorList.map(getAncestorElement)}
       </BreadcrumbList>
     </Breadcrumb>

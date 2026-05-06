@@ -11,6 +11,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { api } from "@/api/api";
+import { playOpen } from "@/lib/sounds";
+import { useSoundStore } from "@/stores/useSoundStore";
 
 export function ReportBugButton() {
   const [open, setOpen] = useState(false);
@@ -54,31 +56,32 @@ export function ReportBugButton() {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 text-muted-foreground hover:text-foreground"
+        <button
+          type="button"
+          aria-label="Report a bug"
+          onClick={() => { if (useSoundStore.getState().enabled) playOpen(); }}
+          className="inline-flex h-9 w-9 items-center justify-center border-2 border-bb-border/55 bg-bb-surface/72 text-bb-muted-strong hover:text-bb-accent hover:border-bb-accent transition-colors"
         >
           <Bug className="size-[18px]" />
-        </Button>
+        </button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Bug size={15} className="text-muted-foreground" />
+            <Bug size={15} className="text-bb-muted-strong" />
             Report a bug
           </DialogTitle>
         </DialogHeader>
 
         {sent ? (
-          <div className="flex flex-col items-center gap-2 py-8 text-emerald-400">
+          <div className="flex flex-col items-center gap-2 py-8 text-bb-success">
             <CheckCircle size={32} />
-            <p className="text-sm font-medium">Report sent — thank you!</p>
+            <p className="font-display text-sm uppercase tracking-tight">Report sent — thank you!</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4 pt-1">
             <div className="space-y-1.5">
-              <Label htmlFor="bug-title" className="text-xs text-muted-foreground">
+              <Label htmlFor="bug-title" className="font-mono text-[10px] uppercase tracking-[0.16em] text-bb-muted-strong">
                 Title
               </Label>
               <Input
@@ -87,11 +90,10 @@ export function ReportBugButton() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 required
-                className="bg-muted/40 border-border/60 focus-visible:border-border"
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="bug-description" className="text-xs text-muted-foreground">
+              <Label htmlFor="bug-description" className="font-mono text-[10px] uppercase tracking-[0.16em] text-bb-muted-strong">
                 Description
               </Label>
               <textarea
@@ -100,19 +102,18 @@ export function ReportBugButton() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={5}
-                className="w-full resize-none rounded-md border border-border/60 bg-muted/40 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-border transition-colors"
+                className="w-full resize-none border-2 border-bb-border/55 bg-bb-surface/72 px-3 py-2 font-sans text-sm text-bb-ink placeholder:text-bb-muted/70 focus:outline-2 focus:outline-offset-2 focus:outline-bb-accent focus:border-bb-accent transition-colors"
               />
             </div>
             {error && (
-              <p className="text-xs text-rose-400">{error}</p>
+              <p className="font-mono text-xs text-bb-error">{error}</p>
             )}
             <div className="flex justify-end gap-2 pt-1">
               <Button
                 type="button"
-                variant="ghost"
+                variant="outline"
                 size="sm"
                 onClick={() => setOpen(false)}
-                className="text-muted-foreground"
               >
                 Cancel
               </Button>

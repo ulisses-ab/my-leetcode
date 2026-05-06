@@ -1,0 +1,9 @@
+{
+  "title": "LRU Cache",
+  "description": "",
+  "difficulty": "EASY",
+  "tags": [
+    "hash-map",
+    "linked-list"
+  ]
+}

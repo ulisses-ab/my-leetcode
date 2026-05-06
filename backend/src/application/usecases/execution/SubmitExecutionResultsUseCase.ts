@@ -48,6 +48,18 @@ export class SubmitExecutionResultsUseCase {
     submission.status = status;
     submission.finishedAt = new Date();
 
+    if (status === SubmissionStatus.ACCEPTED) {
+      try {
+        const results = JSON.parse(fileContent.toString());
+        if (Array.isArray(results.testcases) && results.testcases.length > 0) {
+          submission.runtimeMs = results.testcases.reduce((sum: number, tc: { time_ms?: number }) => sum + (tc.time_ms ?? 0), 0);
+        }
+        submission.memoryKb = results.memory ?? null;
+      } catch {
+        // malformed results — leave runtimeMs/memoryKb null
+      }
+    }
+
     try {
       await this.submissionRepo.save(submission);
     }

@@ -12,17 +12,17 @@ import type { Problem } from "@/types/Problem";
 import type { UserProfile } from "@/api/functions/user";
 
 const LANGUAGES = [
-  { icon: SiC,        label: "C"      },
-  { icon: SiCplusplus, label: "C++"   },
-  { icon: SiRust,     label: "Rust"   },
-  { icon: SiPython,   label: "Python" },
+  { icon: SiC,         label: "C"      },
+  { icon: SiCplusplus, label: "C++"    },
+  { icon: SiRust,      label: "Rust"   },
+  { icon: SiPython,    label: "Python" },
 ] as const;
 
 const DIFFS = [
-  { key: "easy",   label: "Easy",   labelClass: "text-emerald-400/70", barClass: "bg-emerald-500/50" },
-  { key: "medium", label: "Medium", labelClass: "text-amber-400/70",   barClass: "bg-amber-500/50"   },
-  { key: "hard",   label: "Hard",   labelClass: "text-rose-400/70",    barClass: "bg-rose-500/50"    },
-  { key: "expert", label: "Expert", labelClass: "text-violet-400/70",  barClass: "bg-violet-500/50"  },
+  { key: "easy",   label: "Easy",   labelClass: "text-bb-easy",   barClass: "bg-bb-easy"   },
+  { key: "medium", label: "Medium", labelClass: "text-bb-medium", barClass: "bg-bb-medium" },
+  { key: "hard",   label: "Hard",   labelClass: "text-bb-hard",   barClass: "bg-bb-hard"   },
+  { key: "expert", label: "Expert", labelClass: "text-bb-expert", barClass: "bg-bb-expert" },
 ] as const;
 
 function SolvedStats({ profile, problems }: { profile: UserProfile | null; problems: Problem[] }) {
@@ -43,32 +43,30 @@ function SolvedStats({ profile, problems }: { profile: UserProfile | null; probl
   const activeDiffs = DIFFS.filter(d => (totalByDiff[d.key] ?? 0) > 0);
 
   return (
-    <div className="w-55 shrink-0 rounded-xl border border-white/[0.0] overflow-hidden ">
-      {/* Total */}
-      <div className="px-4 pt-4 pb-3.5">
-        <p className="text-[10px] uppercase tracking-widest font-medium text-muted-foreground/90 mb-2">Solved</p>
-        <div className="flex items-baseline gap-1">
-          <span className="text-3xl font-bold font-mono tabular-nums leading-none">{totalSolved}</span>
-          <span className="text-sm font-mono text-muted-foreground/70">/ {problems.length}</span>
+    <div className="w-60 shrink-0 border-2 border-bb-border/55 bg-bb-surface/72 [box-shadow:8px_8px_0_0_var(--bb-shadow)]">
+      <div className="px-4 pt-4 pb-3 border-b-2 border-bb-border/40">
+        <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-bb-muted-strong mb-2">Solved</p>
+        <div className="flex items-baseline gap-1.5">
+          <span className="font-display text-3xl leading-none text-bb-ink">{totalSolved}</span>
+          <span className="font-mono text-xs text-bb-muted-strong">/ {problems.length}</span>
         </div>
       </div>
 
-      {/* Per difficulty */}
-      <div className="px-4 py-3.5 flex flex-col gap-3">
+      <div className="px-4 py-3.5 flex flex-col gap-2.5">
         {activeDiffs.map(({ key, label, labelClass, barClass }) => {
           const total = totalByDiff[key] ?? 0;
           const solved = solvedByDiff[key] ?? 0;
           const pct = total > 0 ? (solved / total) * 100 : 0;
           return (
             <div key={key}>
-              <div className="flex items-center justify-between mb-1.5">
-                <span className={`text-[10px] font-medium ${labelClass}`}>{label}</span>
-                <span className="text-[10px] font-mono tabular-nums text-muted-foreground/35">
-                  {solved}<span className="text-muted-foreground/20">/{total}</span>
+              <div className="flex items-center justify-between mb-1">
+                <span className={`font-mono text-[10px] uppercase tracking-[0.12em] ${labelClass}`}>{label}</span>
+                <span className="font-mono text-[10px] tabular-nums text-bb-muted-strong">
+                  {solved}<span className="text-bb-muted/70">/{total}</span>
                 </span>
               </div>
-              <div className="h-1 w-full rounded-full bg-white/[0.06]">
-                <div className={`h-full rounded-full ${barClass}`} style={{ width: `${pct}%` }} />
+              <div className="h-1.5 w-full border border-bb-border/50 bg-bb-bg-deep p-px">
+                <div className={`h-full ${barClass}`} style={{ width: `${pct}%` }} />
               </div>
             </div>
           );
@@ -88,7 +86,6 @@ function UserStats() {
 
 export function Problems() {
   const setNavbarCenter = useNavbarStore((state) => state.setNavbarCenter);
-  const user = useAuthStore((state) => state.user);
 
   useSEO({
     title: "Problems — EliteCode",
@@ -98,49 +95,55 @@ export function Problems() {
 
   useEffect(() => {
     setNavbarCenter(<></>);
-  }, [])
+  }, []);
 
   return (
-    <div className="min-h-screen flex flex-col items-center bg-background">
+    <div className="min-h-screen flex flex-col bb-red-grid">
       <Navbar />
 
-      <div className="relative w-full max-w-3xl mx-auto px-4 pt-20 pb-16 flex flex-col gap-10">
+      <div className="relative w-full max-w-5xl mx-auto px-4 pt-10 md:pt-14 pb-16 flex flex-col gap-10 flex-1">
         {/* Hero */}
-        <div className="flex items-start gap-8">
+        <section className="flex flex-col md:flex-row md:items-end gap-8">
           <div className="flex-1 space-y-5">
-            <h1 className="text-[46px] sm:text-[54px] font-bold tracking-[-0.025em] leading-[1.08]">
+            <h1 className="bb-text-depth font-display text-4xl sm:text-5xl md:text-6xl uppercase tracking-tight text-bb-ink leading-[1.05]">
               Challenges
             </h1>
 
-            <p className="text-[16px] text-muted-foreground/70 leading-relaxed max-w-sm">
-              A clean, focused environment for practicing software engineering.
+            <p className="font-sans text-sm text-bb-muted-strong leading-relaxed max-w-md">
+              An environment for practicing real software engineering: caches, routers, file systems and other systems-level problems.
             </p>
 
-            <div className="flex items-center gap-10 pt-4">
+            <div className="flex items-center gap-3 pt-1">
               {LANGUAGES.map(({ icon: Icon, label }) => (
-                <div key={label} className="flex flex-col items-center gap-1.5">
-                  <Icon size={44} className="text-muted-foreground/90" />
-                  <span className="text-[15px] font-mono text-muted-foreground/90">{label}</span>
+                <div
+                  key={label}
+                  className="flex h-12 w-12 [box-shadow:4px_4px_0_0_var(--bb-shadow)] items-center justify-center border-2 border-bb-border/55 bg-bb-surface/72 text-bb-muted-strong"
+                  title={label}
+                >
+                  <Icon size={22} />
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="hidden sm:block pt-1">
+          <div className="hidden md:block">
             <UserStats />
           </div>
-        </div>
-
-        <div className="border-t border-border/40" />
+        </section>
 
         <ProblemList />
       </div>
 
-      <footer className="relative w-full py-5 px-4 flex items-center justify-center gap-5">
-        <span className="text-xs text-muted-foreground/35">© {new Date().getFullYear()} EliteCode</span>
-        <Link to="/terms" className="text-xs text-muted-foreground/35 hover:text-muted-foreground transition-colors">Terms</Link>
-        <Link to="/privacy" className="text-xs text-muted-foreground/35 hover:text-muted-foreground transition-colors">Privacy</Link>
+      <footer className="relative w-full border-t-2 border-bb-border/50 bg-bb-bg/80 px-4 md:px-6 py-3 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-bb-muted-strong">
+        <div className="flex items-center gap-4">
+          <Link to="/terms"   className="hover:text-bb-accent transition-colors">Terms</Link>
+          <Link to="/privacy" className="hover:text-bb-accent transition-colors">Privacy</Link>
+        </div>
+        <div className="flex items-center gap-2">
+          <span>© {new Date().getFullYear()} EliteCode</span>
+          <span className="h-2 w-2 bg-bb-accent animate-pulse" />
+        </div>
       </footer>
     </div>
-  )
+  );
 }

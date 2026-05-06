@@ -46,16 +46,23 @@ export function OAuthReturn() {
 
   if (error) {
     return (
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100vh", gap: "1rem" }}>
-        <p>{error}</p>
-        <a href="/">Go back</a>
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4 bb-red-grid">
+        <p className="font-display uppercase text-bb-error text-lg tracking-tight">{error}</p>
+        <a
+          href="/"
+          className="inline-flex items-center px-4 h-9 border-2 border-bb-border/55 bg-bb-surface/72 font-sans text-xs uppercase tracking-wide text-bb-ink hover:border-bb-accent hover:text-bb-accent transition-colors"
+        >
+          Go back
+        </a>
       </div>
     );
   }
 
   return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh" }}>
-      <p>Signing in...</p>
+    <div className="min-h-screen flex items-center justify-center bb-red-grid">
+      <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-bb-muted-strong animate-pulse">
+        Signing in…
+      </p>
     </div>
   );
 }

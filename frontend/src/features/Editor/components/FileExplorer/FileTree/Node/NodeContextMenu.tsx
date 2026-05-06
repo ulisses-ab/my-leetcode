@@ -9,6 +9,8 @@ import { useRef } from "react";
 import { useEditorStore } from "../../../../store/store"
 import type { NodeApi } from "react-arborist";
 import type { FileNode } from "../../../../store/types";
+import { playClick, playDelete } from "@/lib/sounds";
+import { useSoundStore } from "@/stores/useSoundStore";
 
 interface RowContextMenuProps {
   node: NodeApi<FileNode>;
@@ -75,17 +77,17 @@ export function NodeContextMenu({ node, children }: RowContextMenuProps) {
       >
         {!isFolder && (
           <>
-            <ContextMenuItem onClick={() => setActiveFile(node.data.id)}>Open</ContextMenuItem>
+            <ContextMenuItem onClick={() => { if (useSoundStore.getState().enabled) playClick(); setActiveFile(node.data.id); }}>Open</ContextMenuItem>
             <ContextMenuSeparator />
           </>
         )}
-        <ContextMenuItem onClick={handleNewFile}>New file…</ContextMenuItem>
-        <ContextMenuItem onClick={handleNewFolder}>New folder…</ContextMenuItem>
+        <ContextMenuItem onClick={() => { if (useSoundStore.getState().enabled) playClick(); handleNewFile(); }}>New file…</ContextMenuItem>
+        <ContextMenuItem onClick={() => { if (useSoundStore.getState().enabled) playClick(); handleNewFolder(); }}>New folder…</ContextMenuItem>
         <ContextMenuSeparator />
-        <ContextMenuItem onClick={handleRename}>Rename</ContextMenuItem>
+        <ContextMenuItem onClick={(e) => { if (useSoundStore.getState().enabled) playClick(); handleRename(e); }}>Rename</ContextMenuItem>
         <ContextMenuItem
-          onClick={() => deleteNode(node.data.id)}
-          className="text-rose-400 focus:text-rose-400"
+          onClick={() => { if (useSoundStore.getState().enabled) playDelete(); deleteNode(node.data.id); }}
+          className="text-bb-error focus:text-bb-error"
         >
           Delete
         </ContextMenuItem>

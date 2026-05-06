@@ -10,6 +10,8 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import { useEffect, useRef, useState } from "react";
+import { playClick } from "@/lib/sounds";
+import { useSoundStore } from "@/stores/useSoundStore";
 
 export function FileTree() {
   const nodes = useEditorStore((state) => state.nodes);
@@ -53,7 +55,6 @@ export function FileTree() {
           {isEmpty ? (
             <div className="flex flex-col items-center justify-center py-8 gap-1 text-center px-4">
               <p className="text-xs text-muted-foreground/40">No files yet</p>
-              <p className="text-[10px] text-muted-foreground/25">Right-click to create a file</p>
             </div>
           ) : (
             <Tree<FileNode>
@@ -77,10 +78,10 @@ export function FileTree() {
           }
         }}
       >
-        <ContextMenuItem disabled={!!renamingNodeId} onClick={() => { if (!renamingNodeId) { bgCreatingRef.current = true; createNode(rootId!, "", "file"); } }}>
+        <ContextMenuItem disabled={!!renamingNodeId} onClick={() => { if (!renamingNodeId) { if (useSoundStore.getState().enabled) playClick(); bgCreatingRef.current = true; createNode(rootId!, "", "file"); } }}>
           New file…
         </ContextMenuItem>
-        <ContextMenuItem disabled={!!renamingNodeId} onClick={() => { if (!renamingNodeId) { bgCreatingRef.current = true; createNode(rootId!, "", "folder"); } }}>
+        <ContextMenuItem disabled={!!renamingNodeId} onClick={() => { if (!renamingNodeId) { if (useSoundStore.getState().enabled) playClick(); bgCreatingRef.current = true; createNode(rootId!, "", "folder"); } }}>
           New folder…
         </ContextMenuItem>
       </ContextMenuContent>
